@@ -1,5 +1,11 @@
 sudo: false
 language: android
+android:
+  components:
+    - build-tools-27.0.2
+    - android-27
+	- sys-img-armeabi-v7a-android-27
+    - extra
 jdk:
 - oraclejdk8
 script:
