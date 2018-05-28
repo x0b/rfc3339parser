@@ -5,7 +5,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static io.github.x0b.rfc3339parser.Rfc3339.parse;
 import static org.junit.Assert.assertEquals;
@@ -53,5 +55,20 @@ public class Rfc3339Test {
     public void reducePrecision(){
         assertEquals("1996-12-19T16:39:57.123-01:00", Rfc3339.reducePrecision("1996-12-19T16:39:57.123456-01:00", '-'));
         assertEquals("1996-12-19T16:39:57.123-01:00", Rfc3339.reducePrecision("1996-12-19T16:39:57.123-01:00", '-'));
+    }
+
+    @Test
+    public void parseTimeZone(){
+        assertEquals(TimeZone.getTimeZone("GMT-01:00").getID(), Rfc3339.parseTimezone("1996-12-19T16:39:57.123456-01:00").getID());
+        assertEquals(TimeZone.getTimeZone("UTC").getID(), Rfc3339.parseTimezone("1985-04-12T23:20:50Z").getID());
+        assertEquals(TimeZone.getTimeZone("GMT+13:00").getID(), Rfc3339.parseTimezone("1996-12-19T16:39:57.123456+13:00").getID());
+    }
+
+    @Test
+    public void parseCalendar() throws ParseException {
+        String timeString = "1996-12-19T16:39:57.123+01:30";
+        Calendar parsed = Rfc3339.parseCalendar(timeString);
+        assertEquals(Rfc3339.parseTimezone(timeString), parsed.getTimeZone());
+        assertEquals(Rfc3339.parse(timeString), parsed.getTime());
     }
 }
