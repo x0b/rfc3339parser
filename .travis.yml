@@ -1,0 +1,13 @@
+sudo: false
+language: android
+jdk:
+- oraclejdk8
+script:
+- "./gradlew clean build"
+deploy:
+  provider: releases
+  api_key:
+    secure: KQHPrIY3AhbQ41P1y0B2DrDQFMhSeJte+58xnHE67WZ6FGRpWJXvg17xXnZqi6XzcHb8I1yffxOA9aY/WM/5ay74VsIAOyEhSMb26GZH40vF7lKcg3wTTrIE18FDiXtZUxze2DUbY++wzL5EOEo5bt9dCYBIPVsN81+b85VdQIWXL+V/AS2nIHNa1/hzIWkGQUygI19pzJ/n6IfIR338+YhpTe/IxXDSYAnyBpMrp0h8VIkLkRlZLJloYuO7n1M62+ZMhQvetAPtUFT1CFsPcpWEyfn7ZS8ou9wuhIh2m27m5mJAkJssbu95NpdZj/DNginXoxNUSMCkO176YNnDI6RIMzMOF2YLY6k/0gcNzkQP2LWtkI92hcjWP9m+td6FJpt2RjcOq6BmrZD+4/8rU/Wo/hHmoQmuzoV87CioDmVtasI6wrN00APCTRdt/vyizPUoPf66XyWYHr8wmIKH5wqbBPR0cJTupAyvpuRkFnzYgSSC5+4XCqmeDg8imRqq9bPO3psjyKPHNG2KeZN3EAvTWuExE7RLPpZLQgGTpwWnxAaPVQAC+luVSQDj7B/DzDum1af4mYiKK4TEZ8xFIXDtNjw1wR+0/IVvvnblZZE3DIiUidB5k48/4EBYBK0VGmCQ77irITyiU7cV2Z1kaTw1AaSvXfNYxM7UYynLPjs=
+  file: build/outputs/rfc3339parser-release.aar
+  on:
+    repo: x0b/rfc3339parser
