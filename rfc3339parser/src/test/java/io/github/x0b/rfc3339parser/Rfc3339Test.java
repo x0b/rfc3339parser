@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +19,14 @@ public class Rfc3339Test {
     @Test
     public void parseZulu() throws ParseException {
         Date date = parse("1985-04-12T23:20:50Z");
+        assertEquals(482196050000L, date.getTime());
+    }
+
+    // https://tools.ietf.org/html/rfc3339#section-5.6
+    // 'T' and 'Z' may be lower case
+    @Test
+    public void parseZuluL() throws ParseException {
+        Date date = parse("1985-04-12t23:20:50z");
         assertEquals(482196050000L, date.getTime());
     }
 
@@ -51,17 +60,59 @@ public class Rfc3339Test {
         assertEquals(851008197123L,  parse("1996-12-19T16:39:57.123456+01:30").getTime());
     }
 
+    // https://tools.ietf.org/html/rfc3339#section-4.2
+    // reject unqualified time
+    @Test(expected = ParseException.class)
+    public void parseFailUnqualified() throws ParseException {
+        parse("1996-12-19T16:39:57.123");
+    }
+
+    // reject unsigned time zone
+    @Test(expected = ParseException.class)
+    public void parseFailUnsignedTimeZone() throws ParseException {
+        parse("1996-12-19T16:39:57.123 01:00");
+    }
+
+    // reject other notations
+    @Test(expected = ParseException.class)
+    public void parseFailUnsupportedTimeZone() throws ParseException {
+        parse("1996-12-19T16:39:57UTC+01:00");
+    }
+
+    // https://tools.ietf.org/html/rfc3339#appendix-A
+    // reject time missing 'T'
+    @Test(expected = ParseException.class)
+    public void parseFailMissingT() throws ParseException {
+        parse("1996-12-19 16:39:57.123Z");
+    }
+
     @Test
-    public void reducePrecision(){
+    public void reducePrecision() throws ParseException{
         assertEquals("1996-12-19T16:39:57.123-01:00", Rfc3339.reducePrecision("1996-12-19T16:39:57.123456-01:00", '-'));
         assertEquals("1996-12-19T16:39:57.123-01:00", Rfc3339.reducePrecision("1996-12-19T16:39:57.123-01:00", '-'));
     }
 
+    @Test(expected = ParseException.class)
+    public void reducePrecisionFail() throws ParseException{
+        Rfc3339.reducePrecision("1996-12-19T16:39:57.123456-01:00", ' ');
+    }
+
     @Test
-    public void parseTimeZone(){
+    public void parseTimeZone() throws ParseException{
         assertEquals(TimeZone.getTimeZone("GMT-01:00").getID(), Rfc3339.parseTimezone("1996-12-19T16:39:57.123456-01:00").getID());
         assertEquals(TimeZone.getTimeZone("UTC").getID(), Rfc3339.parseTimezone("1985-04-12T23:20:50Z").getID());
         assertEquals(TimeZone.getTimeZone("GMT+13:00").getID(), Rfc3339.parseTimezone("1996-12-19T16:39:57.123456+13:00").getID());
+    }
+
+    @Test(expected = ParseException.class)
+    public void parseTimeZoneCustomIdFail() throws ParseException{
+        Rfc3339.parseTimezone("1996-12-19T16:39:57.123456-01:60");
+    }
+
+    // reject other notations
+    @Test(expected = ParseException.class)
+    public void parseTimeZoneUnsupportedFail() throws ParseException {
+        Rfc3339.parseTimezone("1996-12-19T16:39:57.203GMT0800");
     }
 
     @Test
@@ -70,5 +121,21 @@ public class Rfc3339Test {
         Calendar parsed = Rfc3339.parseCalendar(timeString);
         assertEquals(Rfc3339.parseTimezone(timeString), parsed.getTimeZone());
         assertEquals(Rfc3339.parse(timeString), parsed.getTime());
+    }
+
+    @Test
+    public void parsePrecise() throws ParseException{
+        String timeString = "1996-12-19T16:39:57.123+01:30";
+        BigDecimal parsed = Rfc3339.parsePrecise(timeString);
+        assertEquals(new BigDecimal("851008197.123"), parsed);
+    }
+
+    // reject unknown time zone prefixes
+    // this fails due to a sneaky mathematical minus U+2212
+    // instead of an ascii minus
+    @Test(expected = ParseException.class)
+    public void parsePreciseFail() throws ParseException{
+        String timeString = "1996-12-19T16:39:57.123−01:30";
+        Rfc3339.parsePrecise(timeString);
     }
 }

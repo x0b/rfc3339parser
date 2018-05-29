@@ -19,7 +19,7 @@ allprojects {
 Add module as dependecy:
 ```gradle
 dependencies {
-  implementation 'com.github.x0b.rfc3339parser.1.0.0' 
+  implementation 'com.github.x0b.rfc3339parser:1.1.0' 
 }
 ```
 ## Usage / Examples ##
@@ -33,10 +33,13 @@ TimeZone timeZone = Rfc3339.parseTimezone("1996-12-19T16:39:57.123456+01:30")
 
 // Get a Calendar from date string.
 Calendar calendar = Rfc3339.parseCalendar("1996-12-19T16:39:57.123456+01:30");
+
+// Get a arbitrary-precision time stamp
+BigDecimal timestamp = Rfc3339.parsePrecise("1996-12-19T16:39:57.123456789Z");
 ```
 
 ## Limitations ##
-* Fractional second precision is limited to 3 digits. Any further digits are not supported by ```java.util.Date```. Retrieval of further precision may be introduced at a later date.
+* Fractional second precision is limited to 3 digits. Any further digits are not supported by ```java.util.Date```. To retrieve more precise time stamps use ```parsePrecise(...)```.
 * Dates returned by the main ```parse(...)``` function do not contain a time zone and will be formatted according to default Locale and TimeZone. Use ```parseCalendar(...)``` if the time strings own time zone is required.
 
 ## Contributing ##

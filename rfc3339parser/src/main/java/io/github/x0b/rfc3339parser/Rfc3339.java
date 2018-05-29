@@ -1,6 +1,7 @@
 package io.github.x0b.rfc3339parser;
 
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,7 +36,11 @@ public class Rfc3339 {
 
         // allow time-secfrac
         if('.' == tzStyle){
-            tzStyle = getTimezoneStyle(timeString, 'Z', '+', '-');
+            try {
+                tzStyle = getTimezoneStyle(timeString, 'Z', '+', '-');
+            } catch (NoSuchElementException e) {
+                throw new Rfc3339Exception(String.format("Invalid time zone notation from input <%s>", timeString), 19);
+            }
             timeString = reducePrecision(timeString, tzStyle);
             tzStyle &=~ 3;
         }
@@ -52,7 +57,7 @@ public class Rfc3339 {
             case 'X':
                 return parseInternalZulu(timeString, formatTemplateZuluPrecise);
         }
-        throw new ParseException(timeString, 0);
+        throw new Rfc3339Exception(String.format("Invalid time format on input <%s>", timeString));
     }
 
     /**
@@ -60,21 +65,33 @@ public class Rfc3339 {
      * @param timeString a time string
      * @return a custom {@link TimeZone} with the correct offset
      */
-    public static TimeZone parseTimezone(String timeString){
+    public static TimeZone parseTimezone(String timeString) throws ParseException{
         // allow lowercase per https://tools.ietf.org/html/rfc3339#section-5.6
         timeString = timeString.toUpperCase();
         char tzStyle = timeString.charAt(19);
 
         // allow time-secfrac
         if('.' == tzStyle){
-            tzStyle = getTimezoneStyle(timeString, 'Z', '+', '-');
+            try {
+                tzStyle = getTimezoneStyle(timeString, 'Z', '+', '-');
+            } catch (NoSuchElementException e) {
+                throw new Rfc3339Exception(String.format("Invalid time zone notation from input <%s>", timeString));
+            }
         }
 
         if(tzStyle == 'Z'){
             return TimeZone.getTimeZone("UTC");
         } else {
             String timeZoneId = "GMT" + timeString.substring(timeString.length()-6);
-            return TimeZone.getTimeZone(timeZoneId);
+            TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
+
+            // returns GMT if custom time zone creation was unsuccessful.
+            // GMT and other named time zones are not valid in RFC 3339.
+            if(timeZone.getID().equals("GMT")){
+                throw new Rfc3339Exception("Invalid time zone id");
+            }
+
+            return timeZone;
         }
     }
 
@@ -92,6 +109,27 @@ public class Rfc3339 {
         calendar.setTime(date);
         calendar.setTimeZone(timeZone);
         return calendar;
+    }
+
+    /**
+     * Get a arbitrary precision timestamp from an RFC 3339 time string
+     * @param timeString a formatted time string
+     * @return a {@link BigDecimal}
+     * @throws ParseException if the date format does not conform to RFC 3339
+     */
+    public static BigDecimal parsePrecise(String timeString) throws ParseException {
+        timeString = timeString.toUpperCase();
+        char delim;
+        try {
+            delim = getTimezoneStyle(timeString, 'Z', '-', '+');
+        } catch (NoSuchElementException e){
+            throw new Rfc3339Exception(String.format("Invalid time zone notation from input <%s>", timeString), 19);
+        }
+        long time = parse(timeString).getTime() / 1000;
+        int index = timeString.lastIndexOf(delim);
+        BigDecimal scaledFractional = new BigDecimal("0." + timeString.substring(20, index));
+        BigDecimal timeStamp = new BigDecimal(time);
+        return timeStamp.add(scaledFractional);
     }
 
     /**
@@ -138,7 +176,7 @@ public class Rfc3339 {
     private static char getTimezoneStyle(String timeString, char... styleIds){
         for (char c: styleIds) {
             int lastIndex = timeString.lastIndexOf(c);
-            if(lastIndex != -1){
+            if(lastIndex != -1 && lastIndex > 19){
                 return c;
             }
         }
@@ -155,10 +193,12 @@ public class Rfc3339 {
      * @param delim a time zone delimiter to signal the next part (e.g. Z, +, -)
      * @return a time string with at most 3 fractional second digits
      */
-    static String reducePrecision(String timeString, char delim){
+    static String reducePrecision(String timeString, char delim) throws ParseException{
         int index = timeString.lastIndexOf(delim);
         if(index - 19 > 3){
             timeString = timeString.substring(0, 23) + timeString.substring(index, timeString.length());
+        } else {
+            throw new Rfc3339Exception("Invalid delimiter");
         }
         return timeString;
     }
