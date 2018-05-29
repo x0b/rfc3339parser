@@ -11,6 +11,8 @@ jdk:
 - oraclejdk7
 script:
 - "./gradlew clean build"
+before_install:
+ - chmod +x gradlew
 deploy:
   provider: releases
   api_key:
