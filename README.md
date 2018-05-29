@@ -1,5 +1,7 @@
 # RFC 3339 Date Parser
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://github.com/x0b/rfc3339parser/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/x0b/rfc3339parser.svg?branch=master)](https://travis-ci.org/x0b/rfc3339parser)
+[![](https://img.shields.io/codecov/c/github/x0b/rfc3339parser/master.svg)](https://codecov.io/gh/x0b/rfc3339parser)
 [![](https://jitpack.io/v/x0b/rfc3339parser.svg)](https://jitpack.io/#x0b/rfc3339parser) 
 [![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)

@@ -20,3 +20,11 @@ deploy:
   file: build/outputs/rfc3339parser-release.aar
   on:
     repo: x0b/rfc3339parser
+    branches:
+      only:
+        - master
+
+test:
+    post:
+      - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
+      - bash <(curl -s https://codecov.io/bash)
