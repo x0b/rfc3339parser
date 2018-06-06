@@ -195,8 +195,12 @@ public class Rfc3339 {
      */
     static String reducePrecision(String timeString, char delim) throws ParseException{
         int index = timeString.lastIndexOf(delim);
-        if(index - 19 > 3){
+        int fracLength = index - 19;
+        if(fracLength > 3){
             timeString = timeString.substring(0, 23) + timeString.substring(index, timeString.length());
+        } else if(fracLength > 1){
+            String padding = fracLength == 3 ? "0" : "00";
+            timeString = timeString.substring(0, index) + padding + timeString.substring(index, timeString.length());
         } else {
             throw new Rfc3339Exception("Invalid delimiter");
         }

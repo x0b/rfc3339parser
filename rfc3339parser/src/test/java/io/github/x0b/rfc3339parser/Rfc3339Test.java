@@ -37,6 +37,30 @@ public class Rfc3339Test {
     }
 
     @Test
+    public void parseZuluFractional1() throws ParseException {
+        Date date = parse("1985-04-12T23:20:50.1Z");
+        assertEquals(482196050100L, date.getTime());
+    }
+
+    @Test
+    public void parseZuluFractional2() throws ParseException {
+        Date date = parse("1985-04-12T23:20:50.12Z");
+        assertEquals(482196050120L, date.getTime());
+    }
+
+    @Test
+    public void parseZuluFractional3() throws ParseException {
+        Date date = parse("1985-04-12T23:20:50.123Z");
+        assertEquals(482196050123L, date.getTime());
+    }
+
+    @Test
+    public void parseZuluFractional4() throws ParseException {
+        Date date = parse("1985-04-12T23:20:50.1234Z");
+        assertEquals(482196050123L, date.getTime());
+    }
+
+    @Test
     public void parseOffset() throws ParseException {
         Date date = parse("1996-12-19T16:39:57-08:00");
         assertEquals(851042397000L, date.getTime());
