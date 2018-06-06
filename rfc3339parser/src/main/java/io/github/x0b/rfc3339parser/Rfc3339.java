@@ -13,8 +13,8 @@ import java.util.TimeZone;
 /**
  * Partial implementation of RFC3339 date format
  *
- * @author (c) 2018 <a href="xob@users.noreply.github.com>xob</a>, licensed unter MIT
- * @version 1.0
+ * @author (c) 2018 <a href="mailto:xob@users.noreply.github.com">x0b</a>, licensed unter MIT
+ * @version 1.1.*
  */
 public class Rfc3339 {
     private static final String formatTemplateOffset = "yyyy-MM-dd'T'HH:mm:ssXXX";
@@ -163,10 +163,11 @@ public class Rfc3339 {
      * Parse a date string with appropriate time zone template.
      * @param timeString time string to parse
      * @return a resulting date
+     * @throws Rfc3339Exception when the timezone could not be parsec
      */
     private synchronized static Date parseOffset(Date date, String timeString) throws ParseException{
         String timeZoneId = "GMT" + timeString.substring(timeString.length()-6);
-        TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
+        TimeZone timeZone = parseTimezone(timeString);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.setTimeZone(timeZone);
@@ -187,8 +188,9 @@ public class Rfc3339 {
      * Reduce a time string's fractional second precision to ensure correct parsing.
      * Required as per <a href="https://tools.ietf.org/html/rfc3339#section-5.6>
      *     RFC 3339 §5.6</a> as consequence of <a
-     * href="https://tools.ietf.org/html/rfc2234#section-3.6">RFC 2234 §3.6</a>
+     * href="https://tools.ietf.org/html/rfc2234#section-3.6">RFC 2234 &sect;3.6</a>
      * which allows 1-n digits of decimal fractions while java's date only allows
+     * up to millisecond precision.
      * @param timeString a non-null input string
      * @param delim a time zone delimiter to signal the next part (e.g. Z, +, -)
      * @return a time string with at most 3 fractional second digits

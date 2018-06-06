@@ -2,6 +2,9 @@ package io.github.x0b.rfc3339parser;
 
 import java.text.ParseException;
 
+/**
+ * A specific exception that is thrown when the input does not conform to RFC 3339
+ */
 public class Rfc3339Exception extends ParseException {
 
     /**

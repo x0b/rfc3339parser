@@ -6,7 +6,7 @@
 [![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-RFC 3339 Date Parser is a Java 7 compatible parser to parse date strings as specified in [RFC 3339](https://tools.ietf.org/html/rfc3339).
+RFC 3339 Date Parser is a Java 7+ / Android compatible parser to parse date strings as specified in [RFC 3339](https://tools.ietf.org/html/rfc3339).
 
 ## Installation ##
 Add jitpack as repository in your project/module ```build.gradle```:
@@ -21,7 +21,7 @@ allprojects {
 Add module as dependecy:
 ```gradle
 dependencies {
-  implementation 'com.github.x0b.rfc3339parser:1.1.0' 
+  implementation 'com.github.x0b:rfc3339parser:1.1.3' 
 }
 ```
 ## Usage / Examples ##

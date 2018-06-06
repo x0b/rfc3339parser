@@ -6,6 +6,7 @@ import org.junit.runners.JUnit4;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -161,5 +162,56 @@ public class Rfc3339Test {
     public void parsePreciseFail() throws ParseException{
         String timeString = "1996-12-19T16:39:57.123−01:30";
         Rfc3339.parsePrecise(timeString);
+    }
+
+    @Test
+    public void exec(){
+        assertEquals(851008197000L, modTimeToMilis("1996-12-19T16:39:57.123+01:30"));
+        assertEquals(851008197000L, modTimeToMilis("1996-12-19T16:39:57.123456+01:30"));
+        assertEquals(482196050000L, modTimeToMilis("1985-04-12T23:20:50.520000Z"));
+    }
+    private long modTimeToMilis(String modTime) {
+
+        if(modTime.lastIndexOf("+") > 19 || modTime.lastIndexOf("-") > 19){
+            return modTimeZonedToMillis(modTime);
+        }
+
+        modTime = modTime.toUpperCase();
+        String[] dateTime = modTime.split("T");
+        String yearMonthDay = dateTime[0];
+        String hourMinuteSecond = dateTime[1].substring(0, dateTime[1].length() - 1);
+        if (hourMinuteSecond.contains(".")) {
+            int index = hourMinuteSecond.indexOf(".");
+            hourMinuteSecond = hourMinuteSecond.substring(0, index);
+        }
+
+        String formattedDate = yearMonthDay + " " + hourMinuteSecond + " UTC";
+        long dateInMillis;
+        Date date;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        try {
+            date = simpleDateFormat.parse(formattedDate);
+            dateInMillis = date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            dateInMillis = 0;
+        }
+
+        return dateInMillis;
+    }
+
+    private long modTimeZonedToMillis(String modTime){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        int index = modTime.lastIndexOf("+");
+        if(index == -1){
+            index = modTime.lastIndexOf("-");
+        }
+        int fractionIndex = modTime.indexOf('.');
+        String reducedString = fractionIndex == -1 ? modTime : modTime.substring(0, fractionIndex) + modTime.substring(index);
+        try {
+            return format.parse(reducedString).getTime();
+        } catch (ParseException e) {
+            return 0L;
+        }
     }
 }
