@@ -178,7 +178,7 @@ public class Rfc3339 {
     private static char getTimezoneStyle(String timeString, char... styleIds){
         for (char c: styleIds) {
             int lastIndex = timeString.lastIndexOf(c);
-            if(lastIndex != -1 && lastIndex > 19){
+            if(lastIndex != -1 && lastIndex >= 19){
                 return c;
             }
         }

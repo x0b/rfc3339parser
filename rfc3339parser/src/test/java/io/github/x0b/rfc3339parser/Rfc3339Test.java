@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -141,6 +143,13 @@ public class Rfc3339Test {
     @Test(expected = ParseException.class)
     public void parseTimeZoneUnsupportedFail() throws ParseException {
         Rfc3339.parseTimezone("1996-12-19T16:39:57.203GMT0800");
+    }
+
+    @Test
+    public void testInternalTzStyle() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method getTzStyle = Rfc3339.class.getDeclaredMethod("getTimezoneStyle", String.class, char[].class);
+        getTzStyle.setAccessible(true);
+        getTzStyle.invoke(null, "1996-12-19T16:39:57+01:30", new char[]{'+', '-', 'Z'});
     }
 
     @Test
