@@ -64,6 +64,7 @@ public class Rfc3339 {
      * Parse a RFC 3339-compliant time string and get time zone information
      * @param timeString a time string
      * @return a custom {@link TimeZone} with the correct offset
+     * @throws Rfc3339Exception if timeString does not contain a RFC 3339 valid time zone
      */
     public static TimeZone parseTimezone(String timeString) throws ParseException{
         // allow lowercase per https://tools.ietf.org/html/rfc3339#section-5.6
