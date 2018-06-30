@@ -9,19 +9,19 @@
 RFC 3339 Date Parser is a Java 7+ / Android compatible parser to parse date strings as specified in [RFC 3339](https://tools.ietf.org/html/rfc3339).
 
 ## Installation ##
-Add jitpack as repository in your project/module ```build.gradle```:
+Add JCenter as repository in your project/module ```build.gradle```:
 ```gradle
 allprojects {
   repositories {
     ...
-    maven { url 'https://jitpack.io' }
+    jcenter()
   }
 }
 ```
 Add module as dependecy:
 ```gradle
 dependencies {
-  implementation 'com.github.x0b:rfc3339parser:1.1.3' 
+  implementation 'com.github.x0b:rfc3339parser:1.1.4' 
 }
 ```
 ## Usage / Examples ##

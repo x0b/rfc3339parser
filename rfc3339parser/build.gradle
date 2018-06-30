@@ -8,6 +8,25 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.4' //version required
 }
 
+ext {
+    bintrayRepo = 'rfc3339parser'
+    bintrayName = 'io.github.x0b.rfc3339parser'
+    libraryName = 'rfc3339parser'
+
+    publishedGroupId = 'io.github.x0b'
+    artifact = 'rfc3339parser'
+    libraryVersion = '1.1.4'
+
+    libraryDescription = 'An RFC 3339 compliant String to Java DateTime Parser'
+    siteUrl = 'https://github.com/x0b/rfc3339parser'
+    gitUrl = 'https://github.com/x0b/rfc3339parser.git'
+    developerId = 'x0b'
+    developerName = 'x0b'
+    developerEmail = 'x0b@users.noreply.github.com'
+    licenseName = 'MIT'
+    licenseUrl = 'http://www.opensource.org/licenses/mit-license.php'
+    allLicenses = ['MIT']
+}
 
 android {
     compileSdkVersion 27
@@ -26,7 +45,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
 
+if(project.rootProject.file('local.properties').exists()){
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/e67fa6d4175efd7b47b5f51994cc9a5ec7e72485/installv1.gradle'
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/e67fa6d4175efd7b47b5f51994cc9a5ec7e72485/bintrayv1.gradle'
 }
 
 dependencies {
@@ -34,21 +57,21 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
+//task sourcesJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    classifier = 'sources'
+//}
 
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
+//task javadoc(type: Javadoc) {
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//}
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
 //    options.encoding = 'UTF-8'
-}
+//}
 artifacts {
     archives javadocJar
     archives sourcesJar
