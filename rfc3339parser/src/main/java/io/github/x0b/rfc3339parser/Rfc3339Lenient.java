@@ -16,7 +16,7 @@ import java.util.TimeZone;
  * @author (c) 2018 <a href="mailto:xob@users.noreply.github.com">x0b</a>, licensed unter MIT
  * @version 1.1.*
  */
-public class Rfc3339 {
+public class Rfc3339Lenient implements Rfc3339Parser{
     private static final String formatTemplateOffset = "yyyy-MM-dd'T'HH:mm:ssXXX";
     private static final String formatTemplateOffsetPrecise = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     private static final String formatTemplateZulu = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -29,7 +29,7 @@ public class Rfc3339 {
      * @return a Date with the resulting date time
      * @throws ParseException if the date format does not conform to RFC 3339
      */
-    public synchronized static Date parse(String timeString) throws ParseException {
+    public synchronized Date parse(String timeString) throws ParseException {
         // allow lowercase per https://tools.ietf.org/html/rfc3339#section-5.6
         timeString = timeString.toUpperCase();
         char tzStyle = timeString.charAt(19);
@@ -66,7 +66,7 @@ public class Rfc3339 {
      * @return a custom {@link TimeZone} with the correct offset
      * @throws Rfc3339Exception if timeString does not contain a RFC 3339 valid time zone
      */
-    public static TimeZone parseTimezone(String timeString) throws ParseException{
+    public TimeZone parseTimezone(String timeString) throws ParseException{
         // allow lowercase per https://tools.ietf.org/html/rfc3339#section-5.6
         timeString = timeString.toUpperCase();
         char tzStyle = timeString.charAt(19);
@@ -90,6 +90,8 @@ public class Rfc3339 {
             // GMT and other named time zones are not valid in RFC 3339.
             if(timeZone.getID().equals("GMT")){
                 throw new Rfc3339Exception("Invalid time zone id");
+            } else if(timeZone.getID().equals("GMT-00:00")){
+                timeZone.setID("Etc/Unknown");
             }
 
             return timeZone;
@@ -103,7 +105,7 @@ public class Rfc3339 {
      * @return a resulting calendar
      * @throws ParseException if the date format does not conform to RFC 3339
      */
-    public synchronized static Calendar parseCalendar(String timeString) throws ParseException{
+    public synchronized Calendar parseCalendar(String timeString) throws ParseException {
         Date date = parse(timeString);
         TimeZone timeZone = parseTimezone(timeString);
         Calendar calendar = Calendar.getInstance();
@@ -118,7 +120,7 @@ public class Rfc3339 {
      * @return a {@link BigDecimal}
      * @throws ParseException if the date format does not conform to RFC 3339
      */
-    public static BigDecimal parsePrecise(String timeString) throws ParseException {
+    public BigDecimal parsePrecise(String timeString) throws ParseException {
         timeString = timeString.toUpperCase();
         char delim;
         try {
@@ -138,7 +140,7 @@ public class Rfc3339 {
      * @param timeString time string to parse
      * @return a resulting date
      */
-    private synchronized static Date parseInternal(String timeString, String parseTemplate) throws ParseException{
+    private synchronized Date parseInternal(String timeString, String parseTemplate) throws ParseException{
         SimpleDateFormat timeFormat = new SimpleDateFormat(parseTemplate, Locale.getDefault());
         timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = timeFormat.parse(timeString);
@@ -150,7 +152,7 @@ public class Rfc3339 {
      * @param timeString time string to parse
      * @return a resulting date
      */
-    private synchronized static Date parseInternalZulu(String timeString, String parseTemplate) throws ParseException{
+    private synchronized Date parseInternalZulu(String timeString, String parseTemplate) throws ParseException{
         SimpleDateFormat formatterZulu = new SimpleDateFormat(parseTemplate, Locale.getDefault());
         formatterZulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = formatterZulu.parse(timeString);
@@ -164,9 +166,9 @@ public class Rfc3339 {
      * Parse a date string with appropriate time zone template.
      * @param timeString time string to parse
      * @return a resulting date
-     * @throws Rfc3339Exception when the timezone could not be parsec
+     * @throws Rfc3339Exception when the timezone could not be parsed
      */
-    private synchronized static Date parseOffset(Date date, String timeString) throws ParseException{
+    private synchronized Date parseOffset(Date date, String timeString) throws ParseException{
         String timeZoneId = "GMT" + timeString.substring(timeString.length()-6);
         TimeZone timeZone = parseTimezone(timeString);
         Calendar calendar = Calendar.getInstance();
